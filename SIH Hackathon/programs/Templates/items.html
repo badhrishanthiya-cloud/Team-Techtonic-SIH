@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="min-h-[calc(100vh-4rem)] bg-ink-900 bg-grid text-white py-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6">
+
+    <!-- Header Section -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+      <div>
+        <a href="{{ url_for('home_page') }}" class="flex items-center gap-2 text-gray-400 hover:text-amber-400 text-sm font-medium mb-2 transition-colors">
+          <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Home
+        </a>
+        <h1 class="font-display text-3xl font-extrabold text-white tracking-wide">
+          Found Item Matches
+        </h1>
+        {% if query_desc %}
+          <p class="text-xs text-gray-400 mt-1">
+            Matching against your description: <span class="text-amber-400 font-medium">"{{ query_desc }}"</span>
+          </p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Cards Grid -->
+    <div id="cards-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+      {% if items %}
+        {% for item in items %}
+        <div class="bg-ink-800 rounded-2xl p-5 border border-white/10 hover:border-amber-500/40 transition-all flex flex-col justify-between group animate-slide-up relative">
+          
+          <!-- PERCENTAGE MATCH BADGE -->
+          {% if query_desc %}
+            <span class="absolute top-8 right-8 z-10 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-400 text-ink-900 shadow-md">
+              {{ item.score }}% Match
+            </span>
+          {% endif %}
+
+          <div>
+            <!-- Image / Fallback -->
+            <div class="relative w-full h-48 rounded-xl bg-ink-900 overflow-hidden mb-4 flex items-center justify-center border border-white/5">
+              {% if item.image %}
+                <img src="data:image/jpeg;base64,{{ item.image }}" alt="{{ item.name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+              {% else %}
+                <div class="flex flex-col items-center text-gray-600">
+                  <i data-lucide="image-off" class="w-8 h-8 mb-1"></i>
+                  <span class="text-xs">No image provided</span>
+                </div>
+              {% endif %}
+            </div>
+
+            <!-- Details -->
+            <h3 class="font-display font-bold text-lg text-white mb-2 group-hover:text-amber-400 transition-colors">
+              {{ item.name }}
+            </h3>
+
+            <div class="space-y-1.5 text-xs text-gray-400 mb-4">
+              <div class="flex items-center gap-2">
+                <i data-lucide="map-pin" class="w-4 h-4 text-amber-400 shrink-0"></i>
+                <span><strong>Location:</strong> {{ item.loc }}</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <i data-lucide="phone" class="w-4 h-4 text-found-400 shrink-0"></i>
+                <span><strong>Contact:</strong> {{ item.phone }}</span>
+              </div>
+            </div>
+
+            <p class="text-gray-300 text-xs line-clamp-3 mb-4 leading-relaxed">
+              {{ item.description }}
+            </p>
+          </div>
+
+          <!-- Footer Actions -->
+          <div class="pt-3 border-t border-white/10 flex items-center justify-between text-xs mt-auto">
+            <a href="tel:{{ item.phone }}" class="flex items-center gap-1 font-semibold text-amber-400 hover:text-amber-300 transition-colors">
+            </a>
+
+            <!-- RETRIEVED BUTTON -->
+            <button onclick="openRetrievedModal( {{ item.id }} )" class="px-3 py-1.5 bg-found-600 hover:bg-found-500 text-white rounded-lg font-medium transition-colors">
+              Retrieved?
+            </button>
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="col-span-full text-center py-12 text-gray-500">
+          <i data-lucide="package-open" class="w-12 h-12 mx-auto mb-3 opacity-50"></i>
+          <p class="text-base font-semibold">No reported found items yet.</p>
+        </div>
+      {% endif %}
+
+    </div>
+  </div>
+</div>
+
+<!-- POPUP MODAL -->
+<div id="retrievedModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+  <div class="bg-ink-800 border border-white/10 rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl">
+    <div class="w-12 h-12 rounded-full bg-found-500/20 text-found-400 flex items-center justify-center mx-auto mb-4">
+      <i data-lucide="check-circle-2" class="w-6 h-6"></i>
+    </div>
+    <h3 class="text-lg font-bold text-white mb-2">Item Retrieved?</h3>
+    <p class="text-xs text-gray-400 mb-6">Has this item been safely returned to its owner? Confirming will remove it from the page.</p>
+    
+    <div class="flex gap-3 justify-center">
+      <!-- NO BUTTON: Simply closes popup & remains on items page -->
+      <button onclick="closeRetrievedModal()" class="flex-1 px-4 py-2 bg-ink-700 hover:bg-ink-600 text-white text-xs font-semibold rounded-xl transition-colors">
+        No
+      </button>
+
+      <!-- YES BUTTON: Deletes item from DB -->
+      <form id="deleteForm" method="POST" action="" class="flex-1">
+        <button type="submit" class="w-full px-4 py-2 bg-found-500 hover:bg-found-400 text-white text-xs font-semibold rounded-xl transition-colors">
+          Yes, Remove
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openRetrievedModal(itemId) {
+    const modal = document.getElementById('retrievedModal');
+    const deleteForm = document.getElementById('deleteForm');
+    
+    // Set form action dynamically to target item delete route
+    deleteForm.action = `/delete-item/${itemId}?search_desc={{ query_desc }}`;
+    modal.classList.remove('hidden');
+  }
+
+  function closeRetrievedModal() {
+    const modal = document.getElementById('retrievedModal');
+    modal.classList.add('hidden');
+  }
+</script>
+{% endblock %}
