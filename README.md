@@ -32,3 +32,23 @@ Every year on campus, 1,000+ items (laptops, student IDs, keys, electronics) are
 * 🔒 **Privacy First:** Finder phone numbers remain hidden until AI verification succeeds.
 * 📸 **Visual Feed:** Instagram-style scrollable catalog of found items on campus.
 
+ ## 📌 System Flow 
+ mermaid
+ graph TD
+    A[Upload Item] --> B[(Database)]
+    B --> C[CLIP AI Matching]
+    C --> D[Search / Claim]
+    D --> E[Verification]
+    E --> F[Safe Contact]
+    F --> G[Generate QR Code]
+    G --> H[Feedback and Suggestions]
+
+├── frontend/     # User Interface & Visual Feed
+├── backend/      # Users, Items & Claims Logic
+├── ai/           # Matching & Similarity Score Algorithms
+└── database/     # User & Item Information Storage
+
+ 
+
+
+
