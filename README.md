@@ -48,6 +48,14 @@ Every year on campus, 1,000+ items (laptops, student IDs, keys, electronics) are
 ├── ai/           # Matching & Similarity Score Algorithms
 └── database/     # User & Item Information Storage
 
+### Roles
+
+HEMAN    - FRONT END DEVELOPER
+AARUSH   - FRONT END DEVELOPER
+BADHRISH - BACK END DEVELOPER
+TRIJAL   - BACK END DEVELOPER
+ANUSHKA  - PPT AND PRESENTATION
+AYUSH    - PPT AND PRESENTATION
  
 
 
