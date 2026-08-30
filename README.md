@@ -19,7 +19,7 @@ Every year on campus, 1,000+ items (laptops, student IDs, keys, electronics) are
 3. Low recovery rate due to unstructured search.
 
 ## 💡 Our Solution
-* **Finders** TAG an item with a photo and geo-location.
+* **Finders** TAG an item with a photo and location.
 * **Losers** FIND items via semantic search and prompt descriptions.
 * **AI Engine** verifies ownership in real time before revealing finder contact info.
 
